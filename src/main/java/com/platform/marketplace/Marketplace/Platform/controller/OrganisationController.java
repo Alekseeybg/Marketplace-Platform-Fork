@@ -32,29 +32,26 @@ public class OrganisationController {
 
     private final EventService eventService;
 
-
     @GetMapping("/settings")
-    public String orgSettings(Model model ,@ModelAttribute("errorMessage") String errorMessage ,@ModelAttribute("nameError")String nameError ,@ModelAttribute("emailError")String emailError,@ModelAttribute("invalidPassword")String invalidPassword){
+    public String orgSettings(Model model, @ModelAttribute("errorMessage") String errorMessage, @ModelAttribute("nameError") String nameError,
+                              @ModelAttribute("emailError") String emailError, @ModelAttribute("invalidPassword") String invalidPassword) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Organisation org = organisationService.findByEmail(authentication.getName());
-        model.addAttribute("organisation" , org);
-        model.addAttribute("org" , new OrganisationUpdateDTO());
-        model.addAttribute("errorMessage" , errorMessage);
-        model.addAttribute("nameError" ,nameError);
-        model.addAttribute("emailError" , emailError);
-        model.addAttribute("invalidPassword" , invalidPassword);
-//        model.addAttribute("locations" , locationService.getAllLocationsToString());
+        model.addAttribute("organisation", org);
+        model.addAttribute("org", new OrganisationUpdateDTO());
+        model.addAttribute("errorMessage", errorMessage);
+        model.addAttribute("nameError", nameError);
+        model.addAttribute("emailError", emailError);
+        model.addAttribute("invalidPassword", invalidPassword);
+        //        model.addAttribute("locations" , locationService.getAllLocationsToString());
         return "organisationSettings";
     }
 
-
-
-
     @PostMapping("update")
-    public ModelAndView updateOrg(@Valid OrganisationUpdateDTO org ,BindingResult result , @ModelAttribute("organisation") Organisation organisation){
-        String nameError ="";
-        String emailError="";
-        if(result.hasErrors()) {
+    public ModelAndView updateOrg(@Valid OrganisationUpdateDTO org, BindingResult result, @ModelAttribute("organisation") Organisation organisation) {
+        String nameError = "";
+        String emailError = "";
+        if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView("redirect:/organisation/settings");
             mav.addObject("organisation", organisation);
             if (result.hasFieldErrors("name")) {
@@ -67,190 +64,188 @@ public class OrganisationController {
             }
             return mav;
         }
-           loggedOrganisationService.updateLoggedOrganisationAccount(org);
+        loggedOrganisationService.updateLoggedOrganisationAccount(org);
         return new ModelAndView("redirect:/logout");
     }
 
-
     @PostMapping("change-password")
-    public ModelAndView changePassword(@Valid OrgPasswordChange orgPas , BindingResult bindingResult){
-        String invalidPassword ="";
-        if(bindingResult.hasErrors()){
-            invalidPassword=bindingResult.getFieldError("newPassword").getDefaultMessage();
+    public ModelAndView changePassword(@Valid OrgPasswordChange orgPas, BindingResult bindingResult) {
+        String invalidPassword = "";
+        if (bindingResult.hasErrors()) {
+            invalidPassword = bindingResult.getFieldError("newPassword").getDefaultMessage();
             return new ModelAndView("redirect:/organisation/settings")
-                    .addObject("invalidPassword" , invalidPassword);
+                .addObject("invalidPassword", invalidPassword);
         }
-            loggedOrganisationService.changeLoggedOrganisationPassword(orgPas);
+        loggedOrganisationService.changeLoggedOrganisationPassword(orgPas);
 
         return new ModelAndView("redirect:/login");
     }
 
-
-
     @PostMapping("disable")
     public ModelAndView disabledOrganisationAccount(@RequestParam("password") String password) {
-                loggedOrganisationService.disableCurrentLoggedAccount(password);
-            return new ModelAndView("redirect:/login");
+        loggedOrganisationService.disableCurrentLoggedAccount(password);
+        return new ModelAndView("redirect:/login");
     }
 
     @GetMapping("/event-management")
-    public String eventManagement(Model model, @ModelAttribute("errorMessage")String errorMessage){
-        model.addAttribute("errorMessage" ,errorMessage);
-        model.addAttribute("events" ,loggedOrganisationService.getEventsOfLoggedOrganisationById());
+    public String eventManagement(Model model, @ModelAttribute("errorMessage") String errorMessage) {
+        model.addAttribute("errorMessage", errorMessage);
+        model.addAttribute("events", loggedOrganisationService.getEventsOfLoggedOrganisationById());
         return "eventManagement";
     }
 
     @GetMapping("/create-event")
-    public String createEvent(Model model ,@ModelAttribute("errorMessage")String errorMessage){
-        model.addAttribute("event" , new EventDTO());
-        model.addAttribute("errorMessage" ,errorMessage);
-        model.addAttribute("locations" , locationService.getAllLocations());
-        model.addAttribute("entrance" , EntranceType.values());
+    public String createEvent(Model model, @ModelAttribute("errorMessage") String errorMessage) {
+        model.addAttribute("event", new EventDTO());
+        model.addAttribute("errorMessage", errorMessage);
+        model.addAttribute("locations", locationService.getAllLocations());
+        model.addAttribute("entrance", EntranceType.values());
         return "createEvent";
     }
 
     @PostMapping("create")
-    public ModelAndView createEvent(@Valid EventDTO event , BindingResult bindingResult){
-        String categoryError ="";
+    public ModelAndView createEvent(@Valid EventDTO event, BindingResult bindingResult) {
+        String categoryError = "";
         String nameError = "";
         String descriptionError = "";
         String linkError = "";
-        String locationError="";
-        String startsAtError ="";
-        String endsAtError="";
-        String keywordsError="";
+        String locationError = "";
+        String startsAtError = "";
+        String endsAtError = "";
+        String keywordsError = "";
         String imageError = "";
-        String addressError ="";
-        if(bindingResult.hasErrors()){
-            if(bindingResult.hasFieldErrors("eventCategories")){
+        String addressError = "";
+        if (bindingResult.hasErrors()) {
+            if (bindingResult.hasFieldErrors("eventCategories")) {
                 categoryError = bindingResult.getFieldError("eventCategories").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("name")){
+            if (bindingResult.hasFieldErrors("name")) {
                 nameError = bindingResult.getFieldError("name").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("description")){
+            if (bindingResult.hasFieldErrors("description")) {
                 descriptionError = bindingResult.getFieldError("description").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("linkToApplicationForm")){
+            if (bindingResult.hasFieldErrors("linkToApplicationForm")) {
                 linkError = bindingResult.getFieldError("linkToApplicationForm").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("locations")){
+            if (bindingResult.hasFieldErrors("locations")) {
                 locationError = bindingResult.getFieldError("locations").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("startsAt")){
+            if (bindingResult.hasFieldErrors("startsAt")) {
                 startsAtError = bindingResult.getFieldError("startsAt").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("endsAt")){
+            if (bindingResult.hasFieldErrors("endsAt")) {
                 endsAtError = bindingResult.getFieldError("endsAt").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("keywords")){
+            if (bindingResult.hasFieldErrors("keywords")) {
                 keywordsError = bindingResult.getFieldError("keywords").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("imagePath")){
+            if (bindingResult.hasFieldErrors("imagePath")) {
                 imageError = bindingResult.getFieldError("imagePath").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("address")){
+            if (bindingResult.hasFieldErrors("address")) {
                 addressError = bindingResult.getFieldError("address").getDefaultMessage();
             }
-            return new ModelAndView("createEvent").addObject("event" ,event)
-                    .addObject("categoryError" , categoryError)
-                    .addObject("nameError" ,nameError)
-                    .addObject("descriptionError" ,descriptionError)
-                    .addObject("linkError" ,linkError)
-                    .addObject("locationError",locationError)
-                    .addObject("startsAtError",startsAtError)
-                    .addObject("endsAtError",endsAtError)
-                    .addObject("keywordsError" , keywordsError)
-                    .addObject("imageError" , imageError)
-                    .addObject("addressError" , addressError)
-                    .addObject("locations" , locationService.getAllLocations());
+            return new ModelAndView("createEvent").addObject("event", event)
+                                                  .addObject("categoryError", categoryError)
+                                                  .addObject("nameError", nameError)
+                                                  .addObject("descriptionError", descriptionError)
+                                                  .addObject("linkError", linkError)
+                                                  .addObject("locationError", locationError)
+                                                  .addObject("startsAtError", startsAtError)
+                                                  .addObject("endsAtError", endsAtError)
+                                                  .addObject("keywordsError", keywordsError)
+                                                  .addObject("imageError", imageError)
+                                                  .addObject("addressError", addressError)
+                                                  .addObject("locations", locationService.getAllLocations());
         }
-            loggedOrganisationService.createEventByLoggedOrganisation(event);
+        loggedOrganisationService.createEventByLoggedOrganisation(event);
 
         return new ModelAndView("redirect:/menu");
     }
 
     @GetMapping("update-event/{id}")
-    public String updateEvent(@PathVariable Long id , @ModelAttribute("errorMessage")String errorMessage ,Model model){
-        model.addAttribute("errorMessage" ,errorMessage);
-        model.addAttribute("event" ,eventService.getEventDTOById(id));
-        model.addAttribute("locations" ,locationService.getAllLocations());
-        String previousUrl = "organisation/update-event/"+id;
-        model.addAttribute("previousUrl" , previousUrl);
+    public String updateEvent(@PathVariable Long id, @ModelAttribute("errorMessage") String errorMessage, Model model) {
+        model.addAttribute("errorMessage", errorMessage);
+        model.addAttribute("event", eventService.getEventDTOById(id));
+        model.addAttribute("locations", locationService.getAllLocations());
+        String previousUrl = "organisation/update-event/" + id;
+        model.addAttribute("previousUrl", previousUrl);
         return "updateEvent";
     }
 
     @PostMapping("update-event/{id}")
-    public ModelAndView updateEvent(@PathVariable Long id,@Valid EventDTO event,BindingResult bindingResult ) {
-        String categoryError ="";
+    public ModelAndView updateEvent(@PathVariable Long id, @Valid EventDTO event, BindingResult bindingResult) {
+        String categoryError = "";
         String nameError = "";
         String descriptionError = "";
         String linkError = "";
-        String locationError="";
-        String startsAtError ="";
-        String endsAtError="";
-        String keywordsError="";
+        String locationError = "";
+        String startsAtError = "";
+        String endsAtError = "";
+        String keywordsError = "";
         String imageError = "";
-        String addressError ="";
+        String addressError = "";
         event.setEventId(id);
-        if(bindingResult.hasErrors()){
-            if(bindingResult.hasFieldErrors("eventCategories")){
+
+        if (bindingResult.hasErrors()) {
+            if (bindingResult.hasFieldErrors("eventCategories")) {
                 categoryError = bindingResult.getFieldError("eventCategories").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("name")){
+            if (bindingResult.hasFieldErrors("name")) {
                 nameError = bindingResult.getFieldError("name").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("description")){
+            if (bindingResult.hasFieldErrors("description")) {
                 descriptionError = bindingResult.getFieldError("description").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("linkToApplicationForm")){
+            if (bindingResult.hasFieldErrors("linkToApplicationForm")) {
                 linkError = bindingResult.getFieldError("linkToApplicationForm").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("locations")){
+            if (bindingResult.hasFieldErrors("locations")) {
                 locationError = bindingResult.getFieldError("locations").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("startsAt")){
+            if (bindingResult.hasFieldErrors("startsAt")) {
                 startsAtError = bindingResult.getFieldError("startsAt").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("endsAt")){
+            if (bindingResult.hasFieldErrors("endsAt")) {
                 endsAtError = bindingResult.getFieldError("endsAt").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("keywords")){
+            if (bindingResult.hasFieldErrors("keywords")) {
                 keywordsError = bindingResult.getFieldError("keywords").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("imagePath")){
+            if (bindingResult.hasFieldErrors("imagePath")) {
                 imageError = bindingResult.getFieldError("imagePath").getDefaultMessage();
             }
-            if(bindingResult.hasFieldErrors("address")){
+            if (bindingResult.hasFieldErrors("address")) {
                 addressError = bindingResult.getFieldError("address").getDefaultMessage();
             }
-            return new ModelAndView("updateEvent").addObject("event" ,event)
-                    .addObject("categoryError" , categoryError)
-                    .addObject("nameError" ,nameError)
-                    .addObject("descriptionError" ,descriptionError)
-                    .addObject("linkError" ,linkError)
-                    .addObject("locationError",locationError)
-                    .addObject("startsAtError",startsAtError)
-                    .addObject("endsAtError",endsAtError)
-                    .addObject("keywordsError" , keywordsError)
-                    .addObject("imageError" , imageError)
-                    .addObject("addressError" , addressError)
-                    .addObject("locations" , locationService.getAllLocations());
+            return new ModelAndView("updateEvent").addObject("event", event)
+                                                  .addObject("categoryError", categoryError)
+                                                  .addObject("nameError", nameError)
+                                                  .addObject("descriptionError", descriptionError)
+                                                  .addObject("linkError", linkError)
+                                                  .addObject("locationError", locationError)
+                                                  .addObject("startsAtError", startsAtError)
+                                                  .addObject("endsAtError", endsAtError)
+                                                  .addObject("keywordsError", keywordsError)
+                                                  .addObject("imageError", imageError)
+                                                  .addObject("addressError", addressError)
+                                                  .addObject("locations", locationService.getAllLocations());
         }
-        loggedOrganisationService.updateEventByOrgIdAndEventId(id , event);
+        loggedOrganisationService.updateEventByOrgIdAndEventId(id, event);
         return new ModelAndView("redirect:/organisation/event-management");
     }
 
     @PostMapping("delete-event/{id}")
-    public ModelAndView deleteEvent(@PathVariable(name = "id") Long id ,@RequestParam String password ){
-        loggedOrganisationService.deleteEventPermanent(id , password);
+    public ModelAndView deleteEvent(@PathVariable(name = "id") Long id, @RequestParam String password) {
+        loggedOrganisationService.deleteEventPermanent(id, password);
         return new ModelAndView("redirect:/organisation/event-management");
     }
 
     @GetMapping("/event-details/{id}")
-    public String showEventDetails(@PathVariable Long id,Model model){
-        model.addAttribute("event" ,eventService.getEventDTOById(id));
-        model.addAttribute("eventId" ,eventService.getEventDTOById(id).getEventId());
+    public String showEventDetails(@PathVariable Long id, Model model) {
+        model.addAttribute("event", eventService.getEventDTOById(id));
+        model.addAttribute("eventId", eventService.getEventDTOById(id).getEventId());
         return "eventDetails";
     }
 
