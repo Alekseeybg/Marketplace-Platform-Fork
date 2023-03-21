@@ -49,7 +49,7 @@ public class AuthenticationController {
 
 
     @PostMapping("submit")
-    public ModelAndView submitRegister(@Valid OrganisationDTO org , BindingResult bindingResult){
+    public ModelAndView submitRegister(@Valid OrganisationDTO org, BindingResult bindingResult){
         String nameError ="";
         String emailError ="";
         String passwordError ="";

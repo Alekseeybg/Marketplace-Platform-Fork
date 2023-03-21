@@ -103,65 +103,43 @@ public class OrganisationController {
         return "createEvent";
     }
 
+//    @PostMapping("create")
+//    public ModelAndView createEvent(@Valid EventDTO event, BindingResult bindingResult) {
+//            createEventErrorHandler(bindingResult);
+//            return new ModelAndView("createEvent").addObject("event", event)
+//                                                  .addObject("categoryError", categoryError)
+//                                                  .addObject("nameError", nameError)
+//                                                  .addObject("descriptionError", descriptionError)
+//                                                  .addObject("linkError", linkError)
+//                                                  .addObject("locationError", locationError)
+//                                                  .addObject("startsAtError", startsAtError)
+//                                                  .addObject("endsAtError", endsAtError)
+//                                                  .addObject("keywordsError", keywordsError)
+//                                                  .addObject("imageError", imageError)
+//                                                  .addObject("addressError", addressError)
+//                                                  .addObject("locations", locationService.getAllLocations());
+//        }
+//        loggedOrganisationService.createEventByLoggedOrganisation(event);
+//
+//        return new ModelAndView("redirect:/menu");
+//    }
+
     @PostMapping("create")
     public ModelAndView createEvent(@Valid EventDTO event, BindingResult bindingResult) {
-        String categoryError = "";
-        String nameError = "";
-        String descriptionError = "";
-        String linkError = "";
-        String locationError = "";
-        String startsAtError = "";
-        String endsAtError = "";
-        String keywordsError = "";
-        String imageError = "";
-        String addressError = "";
-        if (bindingResult.hasErrors()) {
-            if (bindingResult.hasFieldErrors("eventCategories")) {
-                categoryError = bindingResult.getFieldError("eventCategories").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("name")) {
-                nameError = bindingResult.getFieldError("name").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("description")) {
-                descriptionError = bindingResult.getFieldError("description").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("linkToApplicationForm")) {
-                linkError = bindingResult.getFieldError("linkToApplicationForm").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("locations")) {
-                locationError = bindingResult.getFieldError("locations").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("startsAt")) {
-                startsAtError = bindingResult.getFieldError("startsAt").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("endsAt")) {
-                endsAtError = bindingResult.getFieldError("endsAt").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("keywords")) {
-                keywordsError = bindingResult.getFieldError("keywords").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("imagePath")) {
-                imageError = bindingResult.getFieldError("imagePath").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("address")) {
-                addressError = bindingResult.getFieldError("address").getDefaultMessage();
-            }
-            return new ModelAndView("createEvent").addObject("event", event)
-                                                  .addObject("categoryError", categoryError)
-                                                  .addObject("nameError", nameError)
-                                                  .addObject("descriptionError", descriptionError)
-                                                  .addObject("linkError", linkError)
-                                                  .addObject("locationError", locationError)
-                                                  .addObject("startsAtError", startsAtError)
-                                                  .addObject("endsAtError", endsAtError)
-                                                  .addObject("keywordsError", keywordsError)
-                                                  .addObject("imageError", imageError)
-                                                  .addObject("addressError", addressError)
-                                                  .addObject("locations", locationService.getAllLocations());
-        }
-        loggedOrganisationService.createEventByLoggedOrganisation(event);
+        ModelAndView modelAndView = new ModelAndView();
 
-        return new ModelAndView("redirect:/menu");
+        if (bindingResult.hasErrors()) {
+            modelAndView.setViewName("createEvent");
+            modelAndView.addObject("event", event);
+            modelAndView.addAllObjects(bindingResult.getModel());
+
+            return modelAndView;
+        }
+
+        loggedOrganisationService.createEventByLoggedOrganisation(event);
+        modelAndView.setViewName("redirect:/menu");
+
+        return modelAndView;
     }
 
     @GetMapping("update-event/{id}")
@@ -247,6 +225,51 @@ public class OrganisationController {
         model.addAttribute("event", eventService.getEventDTOById(id));
         model.addAttribute("eventId", eventService.getEventDTOById(id).getEventId());
         return "eventDetails";
+    }
+
+    private void createEventErrorHandler(BindingResult bindingResult) {
+        String categoryError = "";
+        String nameError = "";
+        String descriptionError = "";
+        String linkError = "";
+        String locationError = "";
+        String startsAtError = "";
+        String endsAtError = "";
+        String keywordsError = "";
+        String imageError = "";
+        String addressError = "";
+        if (bindingResult.hasErrors()) {
+            if (bindingResult.hasFieldErrors("eventCategories")) {
+                categoryError = bindingResult.getFieldError("eventCategories").getDefaultMessage();
+            }
+            if (bindingResult.hasFieldErrors("name")) {
+                nameError = bindingResult.getFieldError("name").getDefaultMessage();
+            }
+            if (bindingResult.hasFieldErrors("description")) {
+                descriptionError = bindingResult.getFieldError("description").getDefaultMessage();
+            }
+            if (bindingResult.hasFieldErrors("linkToApplicationForm")) {
+                linkError = bindingResult.getFieldError("linkToApplicationForm").getDefaultMessage();
+            }
+            if (bindingResult.hasFieldErrors("locations")) {
+                locationError = bindingResult.getFieldError("locations").getDefaultMessage();
+            }
+            if (bindingResult.hasFieldErrors("startsAt")) {
+                startsAtError = bindingResult.getFieldError("startsAt").getDefaultMessage();
+            }
+            if (bindingResult.hasFieldErrors("endsAt")) {
+                endsAtError = bindingResult.getFieldError("endsAt").getDefaultMessage();
+            }
+            if (bindingResult.hasFieldErrors("keywords")) {
+                keywordsError = bindingResult.getFieldError("keywords").getDefaultMessage();
+            }
+            if (bindingResult.hasFieldErrors("imagePath")) {
+                imageError = bindingResult.getFieldError("imagePath").getDefaultMessage();
+            }
+            if (bindingResult.hasFieldErrors("address")) {
+                addressError = bindingResult.getFieldError("address").getDefaultMessage();
+            }
+        }
     }
 
 }
