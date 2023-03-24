@@ -4,6 +4,8 @@ import com.platform.marketplace.Marketplace.Platform.dto.EventDTO;
 import com.platform.marketplace.Marketplace.Platform.model.Event;
 import com.platform.marketplace.Marketplace.Platform.model.EventCategory;
 import com.platform.marketplace.Marketplace.Platform.model.Location;
+import com.platform.marketplace.Marketplace.Platform.model.Organisation;
+import com.platform.marketplace.Marketplace.Platform.service.event.EventCategoryService;
 import com.platform.marketplace.Marketplace.Platform.service.image.ImageConvertor;
 import com.platform.marketplace.Marketplace.Platform.service.location.LocationService;
 import com.platform.marketplace.Marketplace.Platform.service.organisation.OrganisationService;
@@ -21,9 +23,9 @@ public class EventDtoToEventMapper implements Function<EventDTO, Event> {
 
     private final LocationService locationService;
 
+    private final EventCategoryService eventCategoryService;
 
     private final OrganisationService organisationService;
-
 
     private final EventCategoryConverter converter;
 
@@ -31,23 +33,25 @@ public class EventDtoToEventMapper implements Function<EventDTO, Event> {
 
     @Override
     public Event apply(EventDTO eventDTO) {
-        List<Location> cities = locationService.findLocationsByValues(eventDTO.getLocations());
-        Set<EventCategory> categories = converter.convertToEventCategories(eventDTO.getEventCategories());
+     /*   List<Location> cities = locationService.findLocationsByValues(eventDTO.getLocations());
+        List<EventCategory> categories = eventCategoryService.getAllEventCategories();*/
+        /*Set<EventCategory> categories = converter.convertToEventCategories(eventDTO.getEventCategories());*/
         byte[] imageBytes = imageConvertor.convertMultipartToByteArray(eventDTO);
         String imageDataUrl = imageConvertor.convertByteToString(imageBytes);
-
-        return new Event(categories,
-                eventDTO.getName(),
-                eventDTO.getEntranceType(),
-                eventDTO.getDescription(),
-                eventDTO.getLinkToApplicationForm(),
-                cities,
-                eventDTO.getAddress(),
-                eventDTO.getStartsAt(),
-                eventDTO.getEndsAt(),
-                eventDTO.getKeywords(),
-                imageBytes,
-                imageDataUrl,
-                organisationService.findOrganisationById(eventDTO.getOrganisationId()));
+        Organisation organisation = organisationService.findOrganisationById(eventDTO.getOrganisationId());
+        Event newEvent = new Event(eventDTO.getEventCategory(),
+                                   eventDTO.getName(),
+                                   eventDTO.getEntranceType(),
+                                   eventDTO.getDescription(),
+                                   eventDTO.getLinkToApplicationForm(),
+                                   eventDTO.getLocation(),
+                                   eventDTO.getAddress(),
+                                   eventDTO.getStartsAt(),
+                                   eventDTO.getEndsAt(),
+                                   eventDTO.getKeywords(),
+                                   imageBytes,
+                                   imageDataUrl,
+                                   organisation);
+        return newEvent;
     }
 }

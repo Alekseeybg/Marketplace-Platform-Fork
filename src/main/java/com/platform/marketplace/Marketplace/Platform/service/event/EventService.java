@@ -1,34 +1,24 @@
 package com.platform.marketplace.Marketplace.Platform.service.event;
 
+import static com.platform.marketplace.Marketplace.Platform.utility.consts.ConstantMessages.EVENT_BY_ID_NOT_FOUND;
+import static com.platform.marketplace.Marketplace.Platform.utility.consts.ConstantMessages.EVENT_NOT_FOUND;
+import static com.platform.marketplace.Marketplace.Platform.utility.consts.ConstantMessages.EVENT_NOT_FOUND_BY_ORG_ID_MESSAGE;
+
 import com.platform.marketplace.Marketplace.Platform.dto.EventDTO;
-import com.platform.marketplace.Marketplace.Platform.mapper.*;
-import com.platform.marketplace.Marketplace.Platform.model.EventCategory;
-import com.platform.marketplace.Marketplace.Platform.model.Location;
-import com.platform.marketplace.Marketplace.Platform.service.image.ImageConvertor;
-import com.platform.marketplace.Marketplace.Platform.service.location.LocationService;
-import com.platform.marketplace.Marketplace.Platform.utility.Utility;
-import com.platform.marketplace.Marketplace.Platform.utility.consts.EntranceType;
-import com.platform.marketplace.Marketplace.Platform.utility.exceptions.NotFoundException;
+import com.platform.marketplace.Marketplace.Platform.mapper.EventCategoryConverter;
+import com.platform.marketplace.Marketplace.Platform.mapper.EventDtoToEventMapper;
+import com.platform.marketplace.Marketplace.Platform.mapper.EventToEventDtoMapper;
 import com.platform.marketplace.Marketplace.Platform.model.Event;
 import com.platform.marketplace.Marketplace.Platform.model.Organisation;
 import com.platform.marketplace.Marketplace.Platform.repository.EventRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-
-import java.sql.Date;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
+import com.platform.marketplace.Marketplace.Platform.service.image.ImageConvertor;
+import com.platform.marketplace.Marketplace.Platform.service.location.LocationService;
+import com.platform.marketplace.Marketplace.Platform.utility.consts.EntranceType;
+import com.platform.marketplace.Marketplace.Platform.utility.exceptions.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.platform.marketplace.Marketplace.Platform.utility.consts.ConstantMessages.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -117,7 +107,7 @@ public class EventService {
         return convertToDtoList(eventRepository.findEventsByEntranceType(entrance));
     }
 
-    public List<EventDTO> findEventsByKeyWords(String keyword) {
+     public List<EventDTO> findEventsByKeyWords(String keyword) {
         return convertToDtoList(eventRepository.findEventsByKeyWords(keyword));
     }
 
@@ -161,7 +151,6 @@ public class EventService {
     private List<EventDTO> findOldestEvents() {
         return convertToDtoList(eventRepository.findOldestCreatedEvents());
     }
-
     public List<EventDTO> filterByCreatedDate(String filter) {
         if (filter.equals("desc")) {
             return findNewestEvents();
@@ -192,8 +181,9 @@ public class EventService {
     public void createEvent(EventDTO eventDTO, Organisation org) {
         Event event = mapperToEntity.apply(eventDTO);
         event.setOrganisation(org);
-        List<EventCategory> categories = new ArrayList<>(event.getEventCategories());
-        eventCategoryService.saveEventCategoriesFromList(categories);
+
+       /* List<EventCategory> categories = new ArrayList<>(event.getEventCategories());
+        eventCategoryService.saveEventCategoriesFromList(categories);*/
         eventRepository.save(event);
     }
 
@@ -213,13 +203,12 @@ public class EventService {
 
 
     public void updateEvent(Event event, EventDTO eventDTO) {
-        List<Location> locations = locationService.findLocationsByValues(eventDTO.getLocations());
+       event.setLocation(eventDTO.getLocation());
         event.setName(eventDTO.getName());
         event.setEntranceType(eventDTO.getEntranceType());
         event.setDescription(eventDTO.getDescription());
-        event.setEventCategories(converter.convertToEventCategories(eventDTO.getEventCategories()));
+        event.setEventCategory(eventDTO.getEventCategory());
         event.setLinkToApplicationForm(eventDTO.getLinkToApplicationForm());
-        event.setLocations(locations);
         event.setStartsAt(eventDTO.getStartsAt());
         event.setEndsAt(eventDTO.getEndsAt());
         event.setImage(imageConvertor.convertMultipartToByteArray(eventDTO));

@@ -1,9 +1,13 @@
 package com.platform.marketplace.Marketplace.Platform.controller;
 
+import static com.platform.marketplace.Marketplace.Platform.utility.consts.ConstantMessages.DATE_MUST_BE_VALID;
+
 import com.platform.marketplace.Marketplace.Platform.dto.EventDTO;
 import com.platform.marketplace.Marketplace.Platform.dto.OrgPasswordChange;
 import com.platform.marketplace.Marketplace.Platform.dto.OrganisationUpdateDTO;
 import com.platform.marketplace.Marketplace.Platform.model.Organisation;
+import com.platform.marketplace.Marketplace.Platform.repository.EventCategoryRepository;
+import com.platform.marketplace.Marketplace.Platform.service.event.EventCategoryService;
 import com.platform.marketplace.Marketplace.Platform.service.event.EventService;
 import com.platform.marketplace.Marketplace.Platform.service.location.LocationService;
 import com.platform.marketplace.Marketplace.Platform.service.organisation.LoggedOrganisationService;
@@ -29,27 +33,30 @@ public class OrganisationController {
     private final LoggedOrganisationService loggedOrganisationService;
 
     private final LocationService locationService;
+    private final EventCategoryService eventCategoryService;
+    private final EventCategoryRepository eventCategoryRepository;
 
     private final EventService eventService;
 
     @GetMapping("/settings")
     public String orgSettings(Model model, @ModelAttribute("errorMessage") String errorMessage, @ModelAttribute("nameError") String nameError,
                               @ModelAttribute("emailError") String emailError, @ModelAttribute("invalidPassword") String invalidPassword) {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         Organisation org = organisationService.findByEmail(authentication.getName());
+        String email = org.getUser().getUsername();
         model.addAttribute("organisation", org);
+        model.addAttribute("email", email);
         model.addAttribute("org", new OrganisationUpdateDTO());
-        model.addAttribute("errorMessage", errorMessage);
-        model.addAttribute("nameError", nameError);
-        model.addAttribute("emailError", emailError);
-        model.addAttribute("invalidPassword", invalidPassword);
+
         //        model.addAttribute("locations" , locationService.getAllLocationsToString());
         return "organisationSettings";
     }
 
     @PostMapping("update")
-    public ModelAndView updateOrg(@Valid OrganisationUpdateDTO org, BindingResult result, @ModelAttribute("organisation") Organisation organisation) {
-        String nameError = "";
+    public ModelAndView updateOrg(@Valid OrganisationUpdateDTO org, @ModelAttribute("organisation") Organisation organisation, BindingResult bindingResult) {
+       /* String nameError = "";
         String emailError = "";
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView("redirect:/organisation/settings");
@@ -63,6 +70,11 @@ public class OrganisationController {
                 mav.addObject("emailError", emailError);
             }
             return mav;
+        }*/
+        ModelAndView modelAndView = new ModelAndView("redirect:/organisation/settings");
+        if (bindingResult.hasErrors()) {
+            modelAndView.addObject("organisation", organisation);
+            return modelAndView;
         }
         loggedOrganisationService.updateLoggedOrganisationAccount(org);
         return new ModelAndView("redirect:/logout");
@@ -95,49 +107,27 @@ public class OrganisationController {
     }
 
     @GetMapping("/create-event")
-    public String createEvent(Model model, @ModelAttribute("errorMessage") String errorMessage) {
+    public String createEvent(Model model) {
         model.addAttribute("event", new EventDTO());
-        model.addAttribute("errorMessage", errorMessage);
         model.addAttribute("locations", locationService.getAllLocations());
+        model.addAttribute("eventCategories", eventCategoryService.getAllEventCategories());
         model.addAttribute("entrance", EntranceType.values());
         return "createEvent";
     }
 
-//    @PostMapping("create")
-//    public ModelAndView createEvent(@Valid EventDTO event, BindingResult bindingResult) {
-//            createEventErrorHandler(bindingResult);
-//            return new ModelAndView("createEvent").addObject("event", event)
-//                                                  .addObject("categoryError", categoryError)
-//                                                  .addObject("nameError", nameError)
-//                                                  .addObject("descriptionError", descriptionError)
-//                                                  .addObject("linkError", linkError)
-//                                                  .addObject("locationError", locationError)
-//                                                  .addObject("startsAtError", startsAtError)
-//                                                  .addObject("endsAtError", endsAtError)
-//                                                  .addObject("keywordsError", keywordsError)
-//                                                  .addObject("imageError", imageError)
-//                                                  .addObject("addressError", addressError)
-//                                                  .addObject("locations", locationService.getAllLocations());
-//        }
-//        loggedOrganisationService.createEventByLoggedOrganisation(event);
-//
-//        return new ModelAndView("redirect:/menu");
-//    }
-
     @PostMapping("create")
-    public ModelAndView createEvent(@Valid EventDTO event, BindingResult bindingResult) {
-        ModelAndView modelAndView = new ModelAndView();
-
-        if (bindingResult.hasErrors()) {
-            modelAndView.setViewName("createEvent");
+    public ModelAndView createEvent(@Valid @ModelAttribute("event") EventDTO event, BindingResult bindingResult) {
+        ModelAndView modelAndView = new ModelAndView("createEvent");
+        String categoryList = event.getEventCategory();
+        if (bindingResult.hasErrors() || event.getEndsAt().isBefore(event.getStartsAt())) {
             modelAndView.addObject("event", event);
-            modelAndView.addAllObjects(bindingResult.getModel());
-
-            return modelAndView;
+            modelAndView.addObject("locations", locationService.getAllLocations());
+            modelAndView.addObject("eventCategories", eventCategoryService.getAllEventCategories());
+            modelAndView.addObject("err", event.getEndsAt().isBefore(event.getStartsAt()) ? DATE_MUST_BE_VALID : null);
+        } else {
+            loggedOrganisationService.createEventByLoggedOrganisation(event);
+            modelAndView.setViewName("redirect:/menu");
         }
-
-        loggedOrganisationService.createEventByLoggedOrganisation(event);
-        modelAndView.setViewName("redirect:/menu");
 
         return modelAndView;
     }
@@ -225,51 +215,6 @@ public class OrganisationController {
         model.addAttribute("event", eventService.getEventDTOById(id));
         model.addAttribute("eventId", eventService.getEventDTOById(id).getEventId());
         return "eventDetails";
-    }
-
-    private void createEventErrorHandler(BindingResult bindingResult) {
-        String categoryError = "";
-        String nameError = "";
-        String descriptionError = "";
-        String linkError = "";
-        String locationError = "";
-        String startsAtError = "";
-        String endsAtError = "";
-        String keywordsError = "";
-        String imageError = "";
-        String addressError = "";
-        if (bindingResult.hasErrors()) {
-            if (bindingResult.hasFieldErrors("eventCategories")) {
-                categoryError = bindingResult.getFieldError("eventCategories").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("name")) {
-                nameError = bindingResult.getFieldError("name").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("description")) {
-                descriptionError = bindingResult.getFieldError("description").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("linkToApplicationForm")) {
-                linkError = bindingResult.getFieldError("linkToApplicationForm").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("locations")) {
-                locationError = bindingResult.getFieldError("locations").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("startsAt")) {
-                startsAtError = bindingResult.getFieldError("startsAt").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("endsAt")) {
-                endsAtError = bindingResult.getFieldError("endsAt").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("keywords")) {
-                keywordsError = bindingResult.getFieldError("keywords").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("imagePath")) {
-                imageError = bindingResult.getFieldError("imagePath").getDefaultMessage();
-            }
-            if (bindingResult.hasFieldErrors("address")) {
-                addressError = bindingResult.getFieldError("address").getDefaultMessage();
-            }
-        }
     }
 
 }

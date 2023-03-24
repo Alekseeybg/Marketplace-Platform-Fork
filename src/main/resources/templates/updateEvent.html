@@ -252,7 +252,7 @@
                                     th:text="${location}"></option>
                         </select>
                     </div>
-                    <div th:if="${locationError != null}" >
+                    <div th:if="${locationError != null}">
                         <p th:text="${locationError}" style="color: red;"></p>
                     </div>
 
@@ -290,7 +290,7 @@
                         <p th:text="${keywordsError}" style="color: red;"></p>
                     </div>
                     <div class="input-group mb-3">
-                        <input type="text" th:field="*{eventCategories}" class="form-control"
+                        <input type="text" th:field="*{eventCategory}" class="form-control"
                                placeholder="Категория/и на събитието:"  required title="Полето е задължително">
                         <p style="color:red">*</p>
 

@@ -1,45 +1,12 @@
 <!DOCTYPE html>
-<html lang="bg-BG" xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
+<html lang="bg-BG" xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Main Menu</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">Платформа за генериране на събития</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li sec:authorize="isAnonymous()">
-                        <a class="nav-link" th:href="@{/register}">Регистрация</a>
-                    </li>
-                    <li sec:authorize="isAnonymous()">
-                        <a class="nav-link" th:href="@{/login}">Вписване</a>
-                    </li>
-                    <li sec:authorize="hasAuthority('ADMIN')">
-                        <a class="nav-link" th:href="@{/admin/organisations}">Организации</a>
-                    </li>
-                    <li sec:authorize="hasAuthority('ORGANISATION')">
-                        <a class="nav-link" th:href="@{/organisation/settings}">Настройки</a>
-                    </li>
-                    <li sec:authorize="hasAuthority('ORGANISATION')">
-                        <a class="nav-link" th:href="@{/organisation/event-management}">Управление на събития</a>
-                    </li>
-                    <li sec:authorize="isAuthenticated()">
-                        <form class="form-inline" th:action="@{/logout}" method="post">
-                            <button class="btn btn-link nav-link" type="submit">Изход</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+
 
 
     <style>
@@ -71,6 +38,41 @@
     </style>
 
 </head>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">Платформа за генериране на събития</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li sec:authorize="isAnonymous()">
+                            <a class="nav-link" th:href="@{/register}">Регистрация</a>
+                        </li>
+                        <li sec:authorize="isAnonymous()">
+                            <a class="nav-link" th:href="@{/login}">Вписване</a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ADMIN')">
+                            <a class="nav-link" th:href="@{/admin/organisations}">Организации</a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ORGANISATION')">
+                            <a class="nav-link" th:href="@{/organisation/settings}">Настройки</a>
+                        </li>
+                        <li sec:authorize="hasAuthority('ORGANISATION')">
+                            <a class="nav-link" th:href="@{/organisation/event-management}">Управление на събития</a>
+                        </li>
+                        <li sec:authorize="isAuthenticated()">
+                            <form class="form-inline" th:action="@{/logout}" method="post">
+                                <button class="btn btn-link nav-link" type="submit">Изход</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
 <body>
     <div class="container py-5 text-light">
         <h1 class="mb-4">Search</h1>
@@ -202,14 +204,15 @@
                     <div th:each="event : ${events}" class="col-md-6 col-lg-4 mb-4">
                         <a th:href="@{/event-details/{id}(id=${event.eventId})}" class="event-item">
                             <div class="card h-100">
-                                <img th:src="@{'data:image/JPG;base64,'+${event.imageDataUrl}}" class="card-img-top" style="height: 300px; object-fit: cover;">
+                              <!--  <img th:src="@{'data:image/JPG;base64,'+${event.imageDataUrl}}" class="card-img-top" style="height: 300px; object-fit: cover;">-->
+                                <img th:src="@{|data:image/png;base64,${event.imageDataUrl}|}" class="card-img-top">
                                 <div class="card-body">
-                                    <h5 class="card-title mb-3" th:text="${event.name}" style="color: black;"></h5>
-                                    <p class="card-text mb-2" th:text="${#temporals.format(event.startsAt, 'dd MMMM yyyy, HH:mm') + ' ч.'}" style="color: black;"></p>
-                                    <p class="card-text mb-2" th:if="${#temporals.format(event.startsAt, 'yyyyMMdd') != #temporals.format(event.endsAt, 'yyyyMMdd')}" th:text="${#temporals.format(event.endsAt, 'dd MMMM yyyy, HH:mm') + ' ч.'}" style="color: black;"></p>
-                                    <p class="card-text mb-2" th:if="${#temporals.format(event.startsAt, 'yyyyMMdd') == #temporals.format(event.endsAt, 'yyyyMMdd')}" th:text="${'до ' + #temporals.format(event.endsAt, 'HH:mm') + ' ч.'}" style="color: black;"></p>
-                                    <p class="card-text mb-2" th:each="location : ${event.locations}" th:text="${location}" style="color: black;"></p>
-                                    <p class="card-text" th:text="${'Организатор: ' + event.organisationName}" style="color: black;"></p>
+                                    <h5 class="card-title mb-3" th:text="${event.name}"></h5>
+                                    <p class="card-text text-black mb-2" th:text="${#temporals.format(event.startsAt, 'dd MMMM yyyy, HH:mm') + ' ч.'}"></p>
+                                    <p class="card-text text-black mb-2" th:if="${#temporals.format(event.startsAt, 'yyyyMMdd') != #temporals.format(event.endsAt, 'yyyyMMdd')}" th:text="${#temporals.format(event.endsAt, 'dd MMMM yyyy, HH:mm') + ' ч.'}"></p>
+                                    <p class="card-text text-black mb-2" th:if="${#temporals.format(event.startsAt, 'yyyyMMdd') == #temporals.format(event.endsAt, 'yyyyMMdd')}" th:text="${'до ' + #temporals.format(event.endsAt, 'HH:mm') + ' ч.'}" ></p>
+                                    <p class="card-text text-black mb-2"   th:text="${location}"></p>
+                                    <p class="card-text text-black" th:text="${'Организатор: ' + event.organisationName}"></p>
                                 </div>
                             </div>
                         </a>
@@ -218,20 +221,18 @@
             </div>
         </div>
     </div>
-
-
-    <!-- JavaScript -->
-            <!-- Bootstrap 5 JS -->
-            <script src="https://unpkg.com/@popperjs/core@2.10.2/dist/bundle.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-
-            <script>
+    <script>
   $(document).ready(function() {
     $('.table').DataTable({
       responsive: true
     });
   });
 </script>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 
         </body>
     </html>

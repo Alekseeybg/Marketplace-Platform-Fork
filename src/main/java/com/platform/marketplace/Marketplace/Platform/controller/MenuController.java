@@ -25,7 +25,10 @@ public class MenuController {
         return "login";
     }
 
-
+    @GetMapping("/test")
+    public String test(){
+        return "test";
+    }
 
     @GetMapping("/menu")
     public String main(Model model, HttpSession session , @ModelAttribute("errorMessage") String errorMessage) {
@@ -33,7 +36,7 @@ public class MenuController {
         session.removeAttribute("events");
         if (events == null || events.size() == 0) {
             model.addAttribute("errorMessage" ,errorMessage);
-            model.addAttribute("events" , eventService.filterEventsByStartDate("desc"));
+           // model.addAttribute("events" , eventService.filterEventsByStartDate("desc"));
             return "menu";
         }
         model.addAttribute("events", events);
@@ -54,7 +57,7 @@ public class MenuController {
         return new ModelAndView("redirect:/menu");
     }
 
-    @PostMapping("filterByStartDate")
+    /*@PostMapping("filterByStartDate")
     public ModelAndView filterEventsByStartDate(@RequestParam String filter, HttpSession session) {
         session.setAttribute("events", eventService.filterEventsByStartDate(filter));
         return new ModelAndView("redirect:/menu");
@@ -70,7 +73,7 @@ public class MenuController {
     public ModelAndView filterEventsByCreateDate(@RequestParam String filter, HttpSession session) {
         session.setAttribute("events", eventService.filterByCreatedDate(filter));
         return new ModelAndView("redirect:/menu");
-    }
+    }*/
 
 
     @PostMapping("uniqueFilter")

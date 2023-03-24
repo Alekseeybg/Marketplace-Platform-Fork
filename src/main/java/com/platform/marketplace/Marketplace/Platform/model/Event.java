@@ -12,8 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 
 import static com.platform.marketplace.Marketplace.Platform.utility.consts.ConstantMessages.DATE_TIME_FORMAT;
 
@@ -35,29 +33,28 @@ public class Event {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ManyToMany
-    @JoinTable(name = "eventId_eventCategoryId")
-    private Set<EventCategory> eventCategories;
+   /* @ManyToMany
+    @JoinTable(name = "eventId_eventCategoryId")*/
+    private String eventCategory;
     @Column(columnDefinition = "TEXT")
     private String linkToApplicationForm;
-    @ManyToMany
-    @JoinColumn(name = "organisations_location")
-    private List<Location> locations;
+   /* @ManyToMany
+    @JoinColumn(name = "organisations_location")*/
+    private String location;
 
-    private  String address;
+    private String address;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-    @DateTimeFormat(pattern = DATE_TIME_FORMAT ,iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = DATE_TIME_FORMAT, iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startsAt;
-    @DateTimeFormat(pattern = DATE_TIME_FORMAT , iso = DateTimeFormat.ISO.DATE_TIME)
+    @DateTimeFormat(pattern = DATE_TIME_FORMAT, iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime endsAt;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT, locale = "bg_BG")
     private Duration duration;
-
 
     private String keyWords;
 
@@ -68,21 +65,18 @@ public class Event {
     private boolean isEnabled;
     private boolean isExpired;
 
-
-
-
-
     @ManyToOne
     @JoinColumn(name = "organisation_id")
     private Organisation organisation;
 
-    public Event(Set<EventCategory> eventCategories , String name, EntranceType entranceType , String description, String linkToApplicationForm, List<Location> locations, String address, LocalDateTime startsAt, LocalDateTime endsAt, String keyWords, byte[] image,String imageDataUrl ,Organisation organisation) {
-        this.eventCategories = eventCategories;
+    public Event(String eventCategory, String name, EntranceType entranceType, String description, String linkToApplicationForm, String location,
+                 String address, LocalDateTime startsAt, LocalDateTime endsAt, String keyWords, byte[] image, String imageDataUrl, Organisation organisation) {
+        this.eventCategory = eventCategory;
         this.name = name;
         this.entranceType = entranceType;
         this.description = description;
         this.linkToApplicationForm = linkToApplicationForm;
-        this.locations = locations;
+        this.location = location;
         this.address = address;
         this.startsAt = startsAt;
         this.endsAt = endsAt;

@@ -1,106 +1,119 @@
 <!DOCTYPE html>
-<html lang="en"xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Bootstrap Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-</head>
-<body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"  data-bs-theme="dark">
+    <head>
+        <title>Bootstrap Example</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+        <style>
+.display-error{
+  color: #fff;
+  background-color: #dc3545;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+ }
+        </style>
+    </head>
+    <body class="dark">
 
-<div class="container">
-    <h2>Настройки на акаунт</h2>
-    <form class="form-horizontal" action="/organisation/update" method="post">
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="name">Име на организация:</label>
-            <div class="col-sm-10">
-                <input type="name" class="form-control" id="name" placeholder="Име на организация" name="name" th:value="${organisation.organisationName}" required>
-                <div th:if="${nameError != null}" >
-                    <p th:text="${nameError}" style="color: red;"></p>
+        <div class="container">
+            <h2>Настройки на акаунт</h2>
+            <form   class="form-horizontal text-white bg-dark"  enctype="multipart/form-data" th:action="@{update}" th:object="${organisation}" method="POST">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="name">Име на организация:</label>
+                    <div class="col-sm-10">
+                        <input type="name" class="form-control text-white bg-dark" id="name" placeholder="Име на организация" name="name" th:value="${organisation.organisationName}" required>
+                        <!--  <div th:if="${nameError != null}" >
+                              <p th:text="${nameError}" style="color: red;"></p>
+                          </div>-->
+                    </div>
+                    <div th:if="${#fields.hasErrors('organisationName')}" th:errors="*{organisationName}" class="display-error">
+
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="pwd">Електронна поща:</label>
+                        <div class="col-sm-10">
+                            <input type="email" class="form-control text-white bg-dark" id="pwd" placeholder="Електронна поща" name="email" th:value="${email}" required>
+                            <!-- <div th:if="${emailError != null}" >
+                                 <p th:text="${emailError}" style="color: red;"></p>
+                             </div>-->
+                        </div>
+                      <!--  <div th:if="${#fields.hasErrors('email')}" th:errors="${email}" class="display-error">
+
+                        </div>-->
+
+                        <!--        <div>-->
+                        <!--            <label for="locations">Локации:</label>-->
+                        <!--            <select class="form-control" id="locations" name="locations" multiple>-->
+                        <!--                <option th:each="location : ${locations}" th:value="${location}"-->
+                        <!--                        th:text="${location}"></option>-->
+                        <!--            </select>-->
+                        <!--        </div>-->
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-default">Запази</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="pwd">Електронна поща:</label>
-            <div class="col-sm-10">
-                <input type="email" class="form-control" id="pwd" placeholder="Електронна поща" name="email" th:value="${organisation.user.username}" required>
-                <div th:if="${emailError != null}" >
-                    <p th:text="${emailError}" style="color: red;"></p>
+            </form>
+            <h3>Смяна на парола</h3>
+            <form class="form-horizontal" action="/organisation/change-password" method="post">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="currentPassword">Текуща парола:</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="currentPassword" placeholder="Настояща парола" name="oldPassword" required>
+                    </div>
                 </div>
-            </div>
-
-        </div>
-<!--        <div>-->
-<!--            <label for="locations">Локации:</label>-->
-<!--            <select class="form-control" id="locations" name="locations" multiple>-->
-<!--                <option th:each="location : ${locations}" th:value="${location}"-->
-<!--                        th:text="${location}"></option>-->
-<!--            </select>-->
-<!--        </div>-->
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-default">Запази</button>
-            </div>
-        </div>
-    </form>
-    <h3>Смяна на парола</h3>
-    <form class="form-horizontal" action="/organisation/change-password" method="post">
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="currentPassword">Текуща парола:</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" id="currentPassword" placeholder="Настояща парола" name="oldPassword" required>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="pass">Нова парола:</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" id="pass" placeholder="Нова парола" name="newPassword"  required>
-                <div th:if="${invalidPassword != null}" >
-                    <p th:text="${invalidPassword}" style="color: red;"></p>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="pass">Нова парола:</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="pass" placeholder="Нова парола" name="newPassword" required>
+                        <div th:if="${invalidPassword != null}">
+                            <p th:text="${invalidPassword}" style="color: red;"></p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="passs">Потвърди новата парола:</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" id="passs" placeholder="Нова парола" name="confirmNewPassword"  required>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="passs">Потвърди новата парола:</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="passs" placeholder="Нова парола" name="confirmNewPassword" required>
+                    </div>
+                </div>
+
+                <!--        <div class="form-group">-->
+                <!--            <div class="col-sm-offset-2 col-sm-10">-->
+                <!--                <div class="checkbox">-->
+                <!--                    <label><input type="checkbox" name="remember"> Remember me</label>-->
+                <!--                </div>-->
+                <!--            </div>-->
+                <!--        </div>-->
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-default">Запази</button>
+                    </div>
+                </div>
+            </form>
+
+            <form class="form-horizontal" action="/organisation/disable" method="post">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="password">Парола:</label>
+                    <div class="col-sm-10">
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-default">Деактивирай акаунт</button>
+                    </div>
+                </div>
+            </form>
+            <div th:if="${errorMessage}">
+                <p th:text="${errorMessage}" style="color: red;"></p>
             </div>
         </div>
 
-        <!--        <div class="form-group">-->
-        <!--            <div class="col-sm-offset-2 col-sm-10">-->
-        <!--                <div class="checkbox">-->
-        <!--                    <label><input type="checkbox" name="remember"> Remember me</label>-->
-        <!--                </div>-->
-        <!--            </div>-->
-        <!--        </div>-->
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-default">Запази</button>
-            </div>
-        </div>
-    </form>
-
-    <form class="form-horizontal" action="/organisation/disable" method="post">
-        <div class="form-group">
-            <label class="control-label col-sm-2" for="password">Парола:</label>
-            <div class="col-sm-10">
-                <input type="password" id="password" name="password" required>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-default">Деактивирай акаунт</button>
-            </div>
-        </div>
-    </form>
-    <div th:if="${errorMessage}" >
-        <p th:text="${errorMessage}" style="color: red;"></p>
-    </div>
-</div>
-
-</body>
+    </body>
 </html>

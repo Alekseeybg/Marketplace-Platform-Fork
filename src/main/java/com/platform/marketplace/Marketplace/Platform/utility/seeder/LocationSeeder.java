@@ -21,12 +21,11 @@ public class LocationSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if(locationRepository.findAll().size() == 0 &&locationRepository.findAll().size() <28) {
+        if(locationRepository.findAll().size() == 0 && locationRepository.findAll().size() < 95) {
             for (String city : cities.getCities()) {
                 Location location = new Location();
                 location.setCity(city);
                 locationRepository.save(location);
-
             }
         }
     }

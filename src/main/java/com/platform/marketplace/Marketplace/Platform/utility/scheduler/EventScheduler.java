@@ -15,10 +15,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class EventScheduler {
-    private final EventRepository eventRepository;
-
-
-
+  private final EventRepository eventRepository;
 
     @Scheduled(fixedRate = 60000) // Run every minute
     public void setExpiredEventsToExpired() {

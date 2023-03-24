@@ -1,4 +1,5 @@
 package com.platform.marketplace.Marketplace.Platform.utility.annotations;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -9,11 +10,13 @@ import java.lang.annotation.Target;
 
 import static com.platform.marketplace.Marketplace.Platform.utility.consts.ConstantMessages.DATE_MUST_BE_VALID;
 
-@Target({ElementType.TYPE})
+@Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = FutureEndDateTimeValidator.class)
 public @interface FutureEndDateTime {
     String message() default DATE_MUST_BE_VALID;
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

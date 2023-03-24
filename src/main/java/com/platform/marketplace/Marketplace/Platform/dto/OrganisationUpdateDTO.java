@@ -21,4 +21,28 @@ public class OrganisationUpdateDTO {
     private String email;
 
     private List<String> locations;
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public List<String> getLocations() {
+        return locations;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setLocations(List<String> locations) {
+        this.locations = locations;
+    }
 }

@@ -2,6 +2,8 @@ package com.platform.marketplace.Marketplace.Platform.mapper;
 
 import com.platform.marketplace.Marketplace.Platform.model.EventCategory;
 import com.platform.marketplace.Marketplace.Platform.service.event.EventCategoryService;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +17,9 @@ public class EventCategoryConverter {
     @Autowired
     private EventCategoryService eventCategoryService;
 
-    public  Set<EventCategory> convertToEventCategories(String eventCategoriesString) {
-        Set<String> categoryNames = new HashSet<>(Arrays.asList(eventCategoriesString.split("\\s*,\\s*|\\s+")));
-        Set<EventCategory> categories = new HashSet<>();
+    public  List<EventCategory> convertToEventCategories(String eventCategoriesString) {
+        List<String> categoryNames = new ArrayList<>(Arrays.asList(eventCategoriesString.split("\\s*,\\s*|\\s+")));
+        List<EventCategory> categories = new ArrayList<>();
         for (String categoryName : categoryNames) {
             if (!categoryName.isEmpty() && eventCategoryService.findCategoryByValue(categoryName)==null) {
                 EventCategory eventCategory = new EventCategory(categoryName.trim().toLowerCase());
@@ -29,7 +31,7 @@ public class EventCategoryConverter {
         return categories;
     }
 
-    public String convertToString(Set<EventCategory> eventCategories){
+    public String convertToString(List<EventCategory> eventCategories){
         return eventCategories.stream().map(EventCategory :: getType).collect(Collectors.joining(", "));
     }
 }

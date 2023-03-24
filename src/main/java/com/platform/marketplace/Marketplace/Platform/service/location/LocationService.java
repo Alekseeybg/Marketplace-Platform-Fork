@@ -16,16 +16,17 @@ public class LocationService {
     private final LocationRepository locationRepository;
     private final LocationToStringMapper locationToStringMapper;
 
-    public List<Location> getAllLocations(){
+    public List<Location> getAllLocations() {
+
+
         return locationRepository.findAll();
     }
 
-    public List<String> getAllLocationsToString(){
+    public List<String> getAllLocationsToString() {
         return locationToStringMapper.apply(getAllLocations());
     }
 
-
-    public List<Location> findLocationsByValues(List<String>values){
+    public List<Location> findLocationsByValues(List<String> values) {
         return locationRepository.findLocationsByValue(values);
     }
 }

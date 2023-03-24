@@ -29,15 +29,14 @@ import static com.platform.marketplace.Marketplace.Platform.utility.consts.Regex
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@FutureEndDateTime
+
 public class EventDTO {
     private Long eventId;
 
     private String organisationName;
 
-    @NotBlank(message = FIELD_MUST_NOT_BE_BLANK)
-    @Pattern(regexp = CYRILLIC_AND_COMA_PATTERN, message = CYRILLIC_AND_COMA_ALLOWED_MESSAGE)
-    private String eventCategories;
+
+    private String eventCategory;
     @NotBlank(message = NOT_BLANK)
     @Length(min = 3, message = LENGTH_TOO_SMALL)
     @Pattern(regexp = CYRILLIC_EVENT_NAME_PATTERN, message = ONLY_CYRILLIC_ALLOWED)
@@ -53,7 +52,7 @@ public class EventDTO {
     @URL(message = INVALID_URL_MESSAGE)
     private String linkToApplicationForm;
     @Size(min = 1, message = LOCATION_SIZE_NOT_NULL)
-    private List<String> locations;
+    private String location;
     @Nullable
     @Size(min = 0)
     @Pattern(regexp = CYRILLIC_AND_SYMBOLS_ADDRESS_DESCRIPTION_PATTERN, message =ONLY_CYRILLIC_ALLOWED)
@@ -78,15 +77,15 @@ public class EventDTO {
     private boolean isEnabled;
     private String counter;
 
-    public EventDTO(Long eventId, String organisationName , String eventCategories, String name, EntranceType entranceType, String description, String linkToApplicationForm, List<String> locations, String address, LocalDateTime startsAt, LocalDateTime endsAt, String keywords,String imageDataUrl ,boolean isEnabled, Long orgId) {
+    public EventDTO(Long eventId, String organisationName , String eventCategory, String name, EntranceType entranceType, String description, String linkToApplicationForm, String location, String address, LocalDateTime startsAt, LocalDateTime endsAt, String keywords,String imageDataUrl ,boolean isEnabled, Long orgId) {
         this.eventId = eventId;
         this.organisationName = organisationName;
-        this.eventCategories = eventCategories;
+        this.eventCategory = eventCategory;
         this.name = name;
         this.entranceType = entranceType;
         this.description = description;
         this.linkToApplicationForm = linkToApplicationForm;
-        this.locations = locations;
+        this.location = location;
         this.address = address;
         this.startsAt = startsAt;
         this.endsAt = endsAt;

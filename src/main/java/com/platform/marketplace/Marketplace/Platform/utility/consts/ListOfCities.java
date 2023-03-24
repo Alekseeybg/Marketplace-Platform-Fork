@@ -10,7 +10,7 @@ import java.util.HashSet;
 @NoArgsConstructor
 @Component
 public class ListOfCities {
-   private HashSet<String> cities =new HashSet<>( Arrays.asList("Благоевград",
+   private HashSet<String> cities = new HashSet<>( Arrays.asList("Благоевград",
             "Бургас",
             "Варна",
             "Велико Търново",

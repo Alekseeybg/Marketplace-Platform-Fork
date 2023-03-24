@@ -57,6 +57,7 @@ public class LoggedOrganisationService {
         User user = validate.returnAuthenticatedUser();
         Organisation org = organisationService.findOrganisationByUserId(user.getId());
         eventDTO.setOrganisationId(org.getId());
+
         eventService.createEvent(eventDTO, org);
     }
 
